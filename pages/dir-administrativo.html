@@ -4,148 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prova de Língua Portuguesa</title>
-    <style>
-        body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    width: 850px;
-    margin: auto;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-}
-
-.question {
-    border-radius: 5px;
-    width: 800px;
-    margin-bottom: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    background-color: white;
-}
-
-.question-number {
-    display: block;
-    margin-bottom: 30px;
-    font-weight: bolder;
-    font-size: 1.5em;
-}
-
-.comando {
-    display: inline-block;
-    padding-bottom: 60px;
-    text-align: justify;
-}
-
-span li {
-    margin: 10px;
-}
-
-.destaque {
-    text-decoration: underline;
-    font-weight: bolder;
-    font-style: italic;
-}
-
-.options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-align: justify;
-}
-
-button {
-    padding: 10px 15px;
-    font-size: 1em;
-    border: 1px solid rgb(139, 135, 135);
-    border-radius: 5px;
-    background-color: white;
-    color: #3d3d3d;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-weight: bolder;
-}
-
-button.selected {
-    background-color: #007bff;
-    color: white;
-    font-weight: bolder;
-}
-
-button.correct {
-    background-color: rgb(6, 250, 6);
-    color: black;
-    font-weight: bolder;
-}
-
-button.incorrect {
-    background-color: rgb(247, 6, 6);
-    color: black;
-    font-weight: bolder;
-}
-
-button:disabled {
-    background-color: #f0f0f0;
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-.responder-btn {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.responder-btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-#resumo-respostas {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-}
-
-#resumo-respostas th, #resumo-respostas td {
-    border: 1px solid #000;
-    padding: 10px;
-    text-align: center;
-}
-
-.resposta-incorreta {
-    background-color: lightcoral;
-    color: white;
-}
-
-.resposta-correta {
-    background-color: lightgreen;
-    color: black;
-}
-    </style>
+    <link rel="stylesheet" href="style2.css">
+       
 </head>
 <body>
     <header>
-        <h1>Políticas Públicas de Saúde e Educação</h1>
+        <h1>Direito Administrativo</h1>
     </header>
     <main>
         <div class="column">
             
-        <!-- X QUESTÃO -->
+        <!-- 1 QUESTÃO -->
         <div class="question" data-question="1" data-correct="Certo">
             <span class="question-number">Questão 1</span>
             <!-- COMANDO -->
@@ -153,10 +22,10 @@ button:disabled {
                 quanto ao regime jurídico de direito público.</span>
             <div class="options">
                 <div class="option" data-value="Certo">
-                    <button>Certo</button>
+                    <button>C</button> <span>Certo</span>
                 </div>
                 <div class="option" data-value="Errado">
-                    <button>Errado</button>
+                    <button>E</button> <span>Errado</span>
                 </div>
             </div>
             <button class="responder-btn" disabled>Responder</button>
@@ -171,10 +40,10 @@ button:disabled {
                 ao princípio da legalidade, erigido pela Constituição Federal como cláusula pétrea.</span>
             <div class="options">
                 <div class="option" data-value="Certo">
-                    <button>Certo</button>
-                </div>
+                    <button>C</button> 
+                </div> 
                 <div class="option" data-value="Errado">
-                    <button>Errado</button>
+                    <button>E</button>
                 </div>
             </div>
             <button class="responder-btn" disabled>Responder</button>
@@ -576,83 +445,7 @@ button:disabled {
         <!-- As respostas serão inseridas dinamicamente -->
     </tbody>
 </table>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-    const questions = document.querySelectorAll(".question");
-    const tableBody = document.querySelector("#resumo-respostas tbody");
-    const tabela = document.querySelector("#resumo-respostas");
-    const btnRevelar = document.querySelector("#revelar-tabela");
-
-    btnRevelar.addEventListener("click", () => {
-        tabela.style.display = "table"; 
-        btnRevelar.style.display = "none"; 
-    });
-
-    questions.forEach((question) => {
-        const options = question.querySelectorAll(".option");
-        const responderBtn = question.querySelector(".responder-btn");
-        let selectedOption = null;
-        let answered = false;
-
-        options.forEach((option) => {
-            const button = option.querySelector("button");
-
-            button.addEventListener("click", () => {
-                if (answered) return;
-
-                options.forEach((opt) => {
-                    opt.querySelector("button").classList.remove("selected");
-                });
-
-                button.classList.add("selected");
-                selectedOption = button;
-                responderBtn.disabled = false;
-            });
-        });
-
-        responderBtn.addEventListener("click", () => {
-            if (selectedOption) {
-                const questionNumber = question.getAttribute("data-question");
-                const correctAnswer = question.getAttribute("data-correct");
-                const selectedValue = selectedOption.parentElement.getAttribute("data-value");
-
-                let row = document.createElement("tr");
-                let cellQuestion = document.createElement("td");
-                let cellCorrectAnswer = document.createElement("td");
-                let cellChosenAnswer = document.createElement("td");
-
-                cellQuestion.textContent = questionNumber;
-                cellCorrectAnswer.textContent = correctAnswer;
-                cellChosenAnswer.textContent = selectedValue;
-
-                if (selectedValue === correctAnswer) {
-                    selectedOption.classList.add("correct");
-                    cellChosenAnswer.classList.add("resposta-correta"); 
-                } else {
-                    selectedOption.classList.add("incorrect");
-                    cellChosenAnswer.classList.add("resposta-incorreta");
-
-                    options.forEach((option) => {
-                        const button = option.querySelector("button");
-                        if (option.getAttribute("data-value") === correctAnswer) {
-                            button.classList.add("correct");
-                        }
-                    });
-                }
-
-                row.appendChild(cellQuestion);
-                row.appendChild(cellCorrectAnswer);
-                row.appendChild(cellChosenAnswer);
-                tableBody.appendChild(row);
-
-                responderBtn.disabled = true;
-                answered = true;
-            }
-        });
-    });
-});
-
-    </script>
+<script src="script2.js"></script>
+    
 </body>
 </html>
