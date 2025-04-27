@@ -59,10 +59,10 @@
 
             progressBar.style.opacity = 1; // sempre mostra ao começar a rolar
 
-            clearTimeout(scrollTimeout); // limpa o timer anterior
-            scrollTimeout = setTimeout(() => {
-                progressBar.style.opacity = 0; // esconde depois de parar de rolar
-            }, 800); // 800 milissegundos depois de parar
+        clearTimeout(scrollTimeout); // limpa o timer anterior
+        scrollTimeout = setTimeout(() => {
+            progressBar.style.opacity = 0; // esconde depois de parar de rolar
+        }, 800); // 800 milissegundos depois de parar
 
             // Atualiza a largura da barra
             progressBar.style.width = `${scrolled}%`;

@@ -161,6 +161,9 @@ button:disabled {
 }
 
 .responder-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-top: 10px;
     padding: 10px 20px;
     font-size: 16px;
@@ -170,6 +173,15 @@ button:disabled {
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+}
+
+.container {
+    background-color: #242841;
+    padding: 20px; /* opcional: cria um espaço interno */
+    display: flex;
+    justify-content: center; /* botão vai para o final da div */
+    align-items: center; /* opcional: se quiser alinhar verticalmente */
+    margin-top: 58%;
 }
 
 .responder-btn:disabled {
