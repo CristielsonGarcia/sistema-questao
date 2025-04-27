@@ -181,7 +181,7 @@ button:disabled {
     display: flex;
     justify-content: center; /* botão vai para o final da div */
     align-items: center; /* opcional: se quiser alinhar verticalmente */
-    margin-top: 58%;
+    margin-top: 55%;
 }
 
 .responder-btn:disabled {
