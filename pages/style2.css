@@ -67,6 +67,10 @@ h1 {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.6s ease, transform 0.6s ease;
+
+    display: flex;          /* Agora é um flex container */
+    flex-direction: column; /* Conteúdo em coluna (de cima pra baixo) */
+    justify-content: space-between; /* Espaça o conteúdo para jogar o botão lá embaixo */
 }
 
 .question.visible {
@@ -100,28 +104,41 @@ span li {
 .options {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px; /* Mais espaço entre as alternativas */
+    margin-top: 30px; /* Dá um respiro entre o enunciado e as alternativas */
 }
 
 .option {
     display: flex;
     align-items: center;
-    gap: 10px;
-    text-align: justify;
+    gap: 15px; /* Mais espaço entre o botão e o texto */
+    background-color: #1c1f36;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.option:hover {
+    background-color: #292d4a; /* muda a cor ao passar o mouse */
 }
 
 button.alternativa {
-    width: 50px;
-    height: 50px;
-    padding: 10px 15px;
-    font-size: 1em;
-    border: 2px solid rgb(139, 135, 135);
-    border-radius: 5px;
-    background-color: #121420;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1em;
+    border: 2px solid #7237cf;
+    border-radius: 50%; /* botão redondinho */
+    background-color: transparent;
     color: #acabab;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-weight: bolder;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button.alternativa:hover {
+    background-color: #7237cf;
+    color: white;
 }
 
 button {
@@ -176,11 +193,10 @@ button:disabled {
 
 .container {
     background-color: #242841;
-    padding: 20px; /* opcional: cria um espaço interno */
+    padding: 10px;
     display: flex;
-    justify-content: center; /* botão vai para o final da div */
-    align-items: center; /* opcional: se quiser alinhar verticalmente */
-    margin-top: 55%;
+    justify-content: center;
+    align-items: center;
     border-radius: 5px;
 }
 
