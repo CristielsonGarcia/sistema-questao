@@ -14,13 +14,13 @@ body {
     color: white;
     margin: 0;
     padding: 0; /* Tira o padding para o body não ficar maior */
-    height: 100vh; /* importante */
-    overflow: hidden; /* impede barra no body */
+    height: 97%; /* importante */
+    
 }
 
 main {
     max-width: 850px;
-    height: 100vh; /* pega a altura inteira da tela */
+    height: 90vh; /* pega a altura inteira da tela */
     overflow-y: auto; /* apenas o main rola */
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth; /* Isso faz o scroll ser suave */
@@ -57,7 +57,7 @@ h1 {
 .question {
     scroll-snap-align: start;
     scroll-snap-stop: always;
-    height: 97vh;
+    height: 86vh;
     margin-bottom: 20px;
     padding: 20px;
     background-color: #121420;
