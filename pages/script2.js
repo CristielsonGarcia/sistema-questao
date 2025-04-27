@@ -46,16 +46,34 @@
             observer.observe(question);
         });
 
-        const questionsArray = Array.from(document.querySelectorAll('.question'));
-const progressBar = document.getElementById('progress-bar');
-const main = document.querySelector('main'); // importante garantir que pegamos o main certo!
+        let scrollTimeout;
 
-main.addEventListener('scroll', () => {
-    const scrollTop = main.scrollTop;
-    const scrollHeight = main.scrollHeight - main.clientHeight;
-    const scrolled = (scrollTop / scrollHeight) * 100;
-    progressBar.style.width = `${scrolled}%`;
-});
+        const questionsArray = Array.from(document.querySelectorAll('.question'));
+        const progressBar = document.getElementById('progress-bar');
+        const main = document.querySelector('main');
+
+        main.addEventListener('scroll', () => {
+            const scrollTop = main.scrollTop;
+            const scrollHeight = main.scrollHeight - main.clientHeight;
+            const scrolled = (scrollTop / scrollHeight) * 100;
+
+            progressBar.style.opacity = 1; // sempre mostra ao começar a rolar
+
+            clearTimeout(scrollTimeout); // limpa o timer anterior
+            scrollTimeout = setTimeout(() => {
+                progressBar.style.opacity = 0; // esconde depois de parar de rolar
+            }, 800); // 800 milissegundos depois de parar
+
+            // Atualiza a largura da barra
+            progressBar.style.width = `${scrolled}%`;
+
+            // Calcula a cor com base no progresso (0 = vermelho, 100 = verde)
+            const hue = (scrolled * 120) / 100; // 0 (vermelho) a 120 (verde)
+            progressBar.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+        });
+       
+        
+
         responderBtn.addEventListener("click", () => {
             if (selectedOption) {
                 const questionNumber = question.getAttribute("data-question");
@@ -95,6 +113,7 @@ main.addEventListener('scroll', () => {
                 answered = true;
             }
         });
+        
     });
 });
 

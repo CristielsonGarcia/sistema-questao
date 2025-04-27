@@ -35,13 +35,19 @@ main {
     height: 5px;
     background-color: #333;
     z-index: 1000;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+}
+
+#progress-bar-container.hidden {
+    opacity: 0;
 }
 
 #progress-bar {
     width: 0%;
     height: 100%;
-    background-color: #04c680; /* Verde bonito */
-    transition: width 0.3s ease;
+    background-color: hsl(0, 100%, 50%); /* Começa em vermelho */
+    transition: width 0.3s ease, background-color 0.3s ease;
 }
 
 h1 {
