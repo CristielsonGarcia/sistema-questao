@@ -9,19 +9,21 @@
 }
 
 body {
-    scroll-snap-type: y mandatory;
-    overflow-y: scroll;
-    height: 100vh;
     font-family: var(--fonte3);
     background-color: #121420;
     color: white;
-    padding: 20px;
     margin: 0;
+    padding: 0; /* Tira o padding para o body não ficar maior */
+    height: 100vh; /* importante */
+    overflow: hidden; /* impede barra no body */
 }
 
 main {
     max-width: 850px;
-    margin: auto;    
+    height: 100vh; /* pega a altura inteira da tela */
+    overflow-y: auto; /* apenas o main rola */
+    scroll-snap-type: y mandatory;
+    margin: auto;   
 }
 
 h1 {
@@ -148,4 +150,19 @@ button:disabled {
 .resposta-correta {
     background-color: lightgreen;
     color: black;
+}
+
+/* Barra de rolagem moderna */
+main::-webkit-scrollbar {
+    width: 8px; /* largura da barra */
+}
+
+main::-webkit-scrollbar-track {
+    background: #121420; /* fundo da barra */
+}
+
+main::-webkit-scrollbar-thumb {
+    background-color: #7237cf; /* cor da "bolinha" que arrasta */
+    border-radius: 20px; /* borda arredondada */
+    border: 2px solid #121420; /* borda pra dar espaço */
 }
