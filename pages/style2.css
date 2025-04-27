@@ -23,7 +23,25 @@ main {
     height: 100vh; /* pega a altura inteira da tela */
     overflow-y: auto; /* apenas o main rola */
     scroll-snap-type: y mandatory;
+    scroll-behavior: smooth; /* Isso faz o scroll ser suave */
     margin: auto;   
+}
+
+#progress-bar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #333;
+    z-index: 1000;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #04c680; /* Verde bonito */
+    transition: width 0.3s ease;
 }
 
 h1 {
@@ -39,6 +57,15 @@ h1 {
     background-color: #121420;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
+
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.question.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .question-number {
@@ -179,4 +206,20 @@ main::-webkit-scrollbar-thumb {
     background-color: #7237cf; /* cor da "bolinha" que arrasta */
     border-radius: 20px; /* borda arredondada */
     border: 2px solid #121420; /* borda pra dar espaço */
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 10px;
+    }
+    .question {
+        height: 90vh; /* Menor altura para celular */
+        padding: 15px;
+    }
+    button {
+        font-size: 0.9em;
+    }
+    .responder-btn {
+        font-size: 1em;
+    }
 }

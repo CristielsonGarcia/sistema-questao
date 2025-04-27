@@ -32,6 +32,30 @@
             });
         });
 
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0.5 }); // Quando metade da questão estiver visível
+        
+        document.querySelectorAll('.question').forEach((question) => {
+            observer.observe(question);
+        });
+
+        const questionsArray = Array.from(document.querySelectorAll('.question'));
+const progressBar = document.getElementById('progress-bar');
+const main = document.querySelector('main'); // importante garantir que pegamos o main certo!
+
+main.addEventListener('scroll', () => {
+    const scrollTop = main.scrollTop;
+    const scrollHeight = main.scrollHeight - main.clientHeight;
+    const scrolled = (scrollTop / scrollHeight) * 100;
+    progressBar.style.width = `${scrolled}%`;
+});
         responderBtn.addEventListener("click", () => {
             if (selectedOption) {
                 const questionNumber = question.getAttribute("data-question");
