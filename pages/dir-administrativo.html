@@ -14,7 +14,7 @@
     <div id="progress-bar-container">
         <div id="progress-bar"></div>
     </div> 
-    <main>    
+    <main id="questions-container">    
                
         <!-- 1 QUESTÃO -->
         <div class="question" data-question="1" data-correct="Certo">
@@ -77,20 +77,21 @@
         <!---------------------------------------------------------------------------------------->
         
 
-        <button id="revelar-tabela" style="display: block; margin-top: 20px;">Revelar</button>
-
-<table id="resumo-respostas" style="display: none;">
-    <thead>
-        <tr>
-            <th>Questão</th>
-            <th>Resposta Correta</th>
-            <th>Resposta Escolhida</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- As respostas serão inseridas dinamicamente -->
-    </tbody>
-</table>
+        <div class="gabarito" id="final-section">
+            <button id="revelar-tabela" style="display: block; margin-top: 20px;">Revelar</button>
+            <table id="resumo-respostas" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Questão</th>
+                        <th>Resposta Correta</th>
+                        <th>Resposta Escolhida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- As respostas serão inseridas dinamicamente -->
+                </tbody>
+            </table>
+        </div>
     </main>
     
 <script src="script2.js"></script>
