@@ -4,6 +4,7 @@
     const tableBody = document.querySelector("#resumo-respostas tbody");
     const tabela = document.querySelector("#resumo-respostas");
     const btnRevelar = document.querySelector("#revelar-tabela");
+    
 
     btnRevelar.addEventListener("click", () => {
         tabela.style.display = "table"; 
