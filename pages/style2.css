@@ -111,6 +111,11 @@ span li {
     font-style: italic;
 }
 
+.alternativas-romanas li{
+    margin-bottom: 10px;
+    text-align: justify;
+}
+
 .options {
     display: flex;
     flex-direction: column;
@@ -171,12 +176,14 @@ button.selected {
 
 button.correct {
     background-color: #04c680;
+    border: 2px solid #04c680;
     color: white;
     font-weight: bolder;
 }
 
 button.incorrect {
     background-color: #eb5094;
+    border: 2px solid #eb5094;
     color: white;
     font-weight: bolder;
 }
