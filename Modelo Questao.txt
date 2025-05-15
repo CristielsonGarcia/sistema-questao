@@ -60,3 +60,46 @@ Questão Múltipla Escolha
                 <button class="responder-btn" disabled>Responder</button>
             </div> 
         </div>
+
+<!---------------------------------------------------------------------------------------->
+<div class="question" data-question="??" data-correct="?">
+            <div class="question-number">Questão 10</div>
+            <div class="comando">???</div>
+	    <div>
+	      <ul>
+		<li></li>
+		<li></li>
+		<li></li>
+	      </ul>
+	    </div>
+            <div class="options">
+                <div class="option" data-value="A">
+                    <button class="alternativa">A</button>
+                    <!-- ALTERNATIVA A -->
+                    <span>???</span>
+                </div>
+                <div class="option" data-value="B">
+                    <button class="alternativa">B</button>
+                    <!-- ALTERNATIVA B -->
+                    <span>???</span>
+                </div>
+                <div class="option" data-value="C">
+                    <button class="alternativa">C</button>
+                    <!-- ALTERNATIVA C -->
+                    <span>???</span>
+                </div>
+                <div class="option" data-value="D">
+                    <button class="alternativa">D</button>
+                    <!-- ALTERNATIVA D -->
+                    <span>???</span>
+                </div>
+                <div class="option" data-value="E">
+                    <button class="alternativa">E</button>
+                    <!-- ALTERNATIVA E -->
+                    <span>???</span>
+                </div>
+            </div>
+            <div class="container">
+                <button class="responder-btn" disabled>Responder</button>
+            </div> 
+        </div>
