@@ -1,17 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')); // <-- serve arquivos estáticos da pasta public
 
-// Conectar ao banco MongoDB local
 mongoose.connect('mongodb://localhost:27017/bancoDeQuestoes')
   .then(() => console.log("MongoDB conectado!"))
   .catch((err) => console.error("Erro ao conectar ao MongoDB:", err));
 
-// Definição do schema (estrutura da questão)
 const questaoSchema = new mongoose.Schema({
   disciplina: String,
   tipo: String,
@@ -20,10 +19,8 @@ const questaoSchema = new mongoose.Schema({
   respostaCorreta: Number
 });
 
-// Define explicitamente a collection como "sistemaQuestoes"
 const Questao = mongoose.model('Questao', questaoSchema, 'sistemaQuestoes');
 
-// Rota para salvar as questões no banco
 app.post('/questoes', async (req, res) => {
   try {
     const novaQuestao = new Questao(req.body);
@@ -35,7 +32,6 @@ app.post('/questoes', async (req, res) => {
   }
 });
 
-// Rota GET para buscar questões por disciplina
 app.get('/questoes/:disciplina', async (req, res) => {
   try {
     const { disciplina } = req.params;
@@ -47,7 +43,6 @@ app.get('/questoes/:disciplina', async (req, res) => {
   }
 });
 
-// Iniciar servidor
-app.listen(3000, () => {
+app.listen(3000, '0.0.0.0', () => { // <- importante para aceitar conexões externas
   console.log("Servidor rodando na porta 3000");
 });
