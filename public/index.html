@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Responder Questões</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -65,7 +66,25 @@
       gap: 10px;
     }
 
+    .alternativa-letra {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--text-color);
+      border-radius: 6px;
+      margin-right: 12px;
+      font-weight: bold;
+      font-size: 0.95em;
+      background-color: transparent;
+      color: var(--text-color);
+      flex-shrink: 0;
+    }
+
     .alternativa {
+      display: flex;
+      align-items: center;
       padding: 10px 15px;
       border-radius: 8px;
       background-color: #2a2a2a;
@@ -91,6 +110,12 @@
     .alternativa.desabilitada {
       pointer-events: none;
       opacity: 0.6;
+    }
+
+    .enunciado-texto {
+      white-space: pre-line;
+      word-wrap: break-word;
+      text-align: justify;
     }
 
     #btn-proxima {
@@ -144,11 +169,11 @@
     }
 
     h1 {
-      font-size: 6em;
+      font-size: 3em;
     }
 
     label.selecionarDisciplina {
-      font-size: 3em;
+      font-size: 1.5em;
     }
 
     select {
@@ -189,10 +214,8 @@
   <h1><i class="fas fa-pen-alt"></i> Responder Questões</h1>
 
   <label class="selecionarDisciplina" for="disciplina" style="display: block; text-align: center;">Selecione uma disciplina:</label>
-  <select id="disciplina">
+  <select id="disciplina" style="text-align: center;">
     <option value="">--- Escolha ---</option>
-    <option value="D01">Disciplina01</option>
-    <option value="D02">Disciplina02</option>
   </select>
 
   <div id="progresso" style="display: none;">
@@ -240,6 +263,7 @@
       try {
         const res = await fetch(`${SERVER_URL}/questoes/${disciplina}`);
         questoes = await res.json();
+        questoes = embaralharArray(questoes);
 
         if (questoes.length === 0) {
           container.innerHTML = '<p style="text-align:center">Nenhuma questão encontrada.</p>';
@@ -255,6 +279,7 @@
     });
 
     function mostrarQuestao() {
+      
       container.innerHTML = '';
       btnProxima.style.display = 'none';
 
@@ -273,21 +298,52 @@
       const div = document.createElement('div');
       div.classList.add('questao');
 
-      const alternativasHTML = q.alternativas.map((alt, idx) => `
-        <div class="alternativa" data-idx="${idx}" data-correta="${q.respostaCorreta}">
-          ${alt}
-        </div>
-      `).join('');
+      const letras = ["A", "B", "C", "D", "E"];
+      let alternativasHTML;
+
+      if (q.tipo === "certo-errado") {
+        alternativasHTML = `
+          <div class="alternativa" data-idx="0" data-correta="${q.respostaCorreta}">
+            <span class="alternativa-letra">C</span> Certo
+          </div>
+          <div class="alternativa" data-idx="1" data-correta="${q.respostaCorreta}">
+            <span class="alternativa-letra">E</span> Errado
+          </div>
+        `;
+      } else {
+        alternativasHTML = q.alternativas.map((alt, idx) => `
+          <div class="alternativa" data-idx="${idx}" data-correta="${q.respostaCorreta}">
+            <span class="alternativa-letra">${letras[idx]}</span> ${alt}
+          </div>
+        `).join('');
+      }
+
+      let itensHTML = "";
+      if (q.itens && q.itens.length > 0) {
+        itensHTML = `<ol style="margin-top: 10px; text-align: justify;">` + 
+          q.itens.map((item, idx) => `<li style="margin-bottom: 8px;">${item}</li>`).join('') + 
+          `</ol>`;
+      }
 
       div.innerHTML = `
-        <p><strong>Questão ${indiceAtual + 1}:</strong> ${q.enunciado}</p>
+        <p class="enunciado-texto"><strong>Questão ${indiceAtual + 1}:</strong>\n${q.enunciado}</p>
+        ${itensHTML}
         <div class="alternativas">${alternativasHTML}</div>
       `;
+
 
       container.appendChild(div);
       atualizarBarra();
       atualizarPlacar();
       ativarResposta();
+    }
+
+    function embaralharArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
 
     function ativarResposta() {
@@ -329,6 +385,30 @@
     function atualizarPlacar() {
       placar.innerHTML = `Acertos: <strong style="color: var(--success)">${acertos}</strong> | Erros: <strong style="color: var(--error)">${erros}</strong>`;
     }
+
+    // Buscar disciplinas dinamicamente
+    async function carregarDisciplinas() {
+      try {
+        const res = await fetch(`${SERVER_URL}/disciplinas`);
+        const lista = await res.json();
+        const select = document.getElementById('disciplina');
+
+        // Limpa as opções antigas (exceto a primeira)
+        select.innerHTML = '<option value="">--- Escolha ---</option>';
+
+        lista.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d;
+          option.textContent = d;
+          select.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Erro ao carregar disciplinas:", err);
+      }
+    }
+
+    // Carregar ao abrir a página
+    carregarDisciplinas();
   </script>
 </body>
 </html>

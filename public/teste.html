@@ -32,7 +32,7 @@
       padding: 30px;
     }
 
-    section, #area-certo-errado, #area-multipla {
+    section, #area-certo-errado, #area-multipla, #area-itens {
       background-color: var(--card-color);
       border-radius: 10px;
       padding: 20px;
@@ -131,11 +131,6 @@
       width: 100%;
       justify-content: start;
     }
-
-    .btn-toggle-modo.edicao {
-      background-color: var(--danger);
-    }
-
   </style>
 </head>
 <body>
@@ -144,8 +139,9 @@
       <label for="disciplina">Escolha uma disciplina:</label><br>
       <select id="disciplina">
         <option value="">--- Escolha ---</option>
-        <option value="D01">Disciplina01</option>
-        <option value="D02">Disciplina02</option>
+        <option value="Direito Administrativo">Direito Administrativo</option>
+        <option value="Direito Constitucional">Direito Constitucional</option>
+        <option value="Informática">Informática</option>
       </select>
       <div id="tipo-questao" style="display: none;">
         <br><label for="tipo">Escolha o tipo da questão:</label><br>
@@ -153,6 +149,7 @@
           <option value="">--- Escolha ---</option>
           <option value="certo-errado">Certo/Errado</option>
           <option value="multipla">Múltipla Escolha</option>
+          <option value="com-itens">Com Itens</option>
         </select>
       </div>
     </section>
@@ -176,6 +173,14 @@
       </div>
     </div>
 
+    <div id="area-itens" style="display: none;">
+      <h3>Adicione os itens da questão:</h3>
+      <div id="itens"></div>
+      <button type="button" onclick="adicionarItem()">
+        <i class="fas fa-plus"></i> Adicionar Item
+      </button>
+    </div>
+
     <div id="area-multipla" style="display: none;">
       <h3>Alternativas:</h3>
       <div id="alternativas" class="modo-edicao"></div>
@@ -197,8 +202,10 @@
     const enunciado = document.getElementById("enunciado");
     const areaCE = document.getElementById("area-certo-errado");
     const areaMultipla = document.getElementById("area-multipla");
+    const areaItens = document.getElementById("area-itens");
     const btnEnviar = document.getElementById("btn-enviar");
     const alternativasDiv = document.getElementById("alternativas");
+    const itensDiv = document.getElementById("itens");
     const toggleModoBtn = document.getElementById("btn-toggle-modo");
 
     let modoEdicao = true;
@@ -209,13 +216,15 @@
       enunciado.style.display = "none";
       areaCE.style.display = "none";
       areaMultipla.style.display = "none";
+      areaItens.style.display = "none";
       btnEnviar.style.display = "none";
     });
 
     tipo.addEventListener("change", () => {
       enunciado.style.display = tipo.value ? "block" : "none";
       areaCE.style.display = tipo.value === "certo-errado" ? "block" : "none";
-      areaMultipla.style.display = tipo.value === "multipla" ? "block" : "none";
+      areaMultipla.style.display = tipo.value === "multipla" || tipo.value === "com-itens" ? "block" : "none";
+      areaItens.style.display = tipo.value === "com-itens" ? "block" : "none";
       btnEnviar.style.display = "none";
     });
 
@@ -223,30 +232,22 @@
       modoEdicao = !modoEdicao;
       toggleModoBtn.textContent = modoEdicao ? "Editar Alternativas" : "Escolher Alternativa";
       toggleModoBtn.classList.toggle("edicao", modoEdicao);
-
       alternativasDiv.className = modoEdicao ? "modo-edicao" : "modo-selecao";
-      atualizarAlternativas(); // manter conteúdo
+      atualizarAlternativas();
       btnEnviar.style.display = "none";
     });
 
-    function atualizarAlternativas() {
-      const valores = Array.from(alternativasDiv.querySelectorAll('.alternativa')).map((el, i) => {
-        const texto = el.querySelector('input[type="text"]')?.value || el.textContent.trim();
-        return texto;
-      });
+    document.body.addEventListener('change', () => {
+      const selected = document.querySelector('input[name="correta"]:checked') ||
+                       document.querySelector('input[name="resposta-ce"]:checked');
+      btnEnviar.style.display = selected ? "inline-flex" : "none";
+    });
 
-      alternativasDiv.innerHTML = "";
-      valores.forEach((texto, i) => {
-        const div = document.createElement("div");
-        div.className = "alternativa" + (modoEdicao ? "" : " selecionavel");
-        if (modoEdicao) {
-          div.innerHTML = `<input type="radio" name="correta" value="${i}"><input type="text" value="${texto}" placeholder="Alternativa ${String.fromCharCode(65 + i)}">`;
-        } else {
-          div.innerHTML = `<input type="radio" name="correta" value="${i}" id="alt-${i}">
-                           <label for="alt-${i}">${texto}</label>`;
-        }
-        alternativasDiv.appendChild(div);
-      });
+    function adicionarItem() {
+      const count = itensDiv.children.length + 1;
+      const div = document.createElement("div");
+      div.innerHTML = `<textarea rows="3" placeholder="Item ${count}" style="width: 100%; margin-top: 10px;"></textarea>`;
+      itensDiv.appendChild(div);
     }
 
     function adicionarAlternativa() {
@@ -259,11 +260,26 @@
       alternativasDiv.appendChild(nova);
     }
 
-    document.body.addEventListener('change', () => {
-      const selected = document.querySelector('input[name="correta"]:checked') ||
-                       document.querySelector('input[name="resposta-ce"]:checked');
-      btnEnviar.style.display = selected ? "inline-flex" : "none";
-    });
+    function atualizarAlternativas() {
+      const valores = Array.from(alternativasDiv.querySelectorAll('.alternativa')).map(el => {
+        const input = el.querySelector('input[type="text"]');
+        return input ? input.value : el.textContent.trim();
+      });
+
+      alternativasDiv.innerHTML = "";
+      valores.forEach((texto, i) => {
+        const div = document.createElement("div");
+        div.className = "alternativa" + (modoEdicao ? "" : " selecionavel");
+        if (modoEdicao) {
+          div.innerHTML = `<input type="radio" name="correta" value="${i}">
+                           <input type="text" value="${texto}" placeholder="Alternativa ${String.fromCharCode(65 + i)}">`;
+        } else {
+          div.innerHTML = `<input type="radio" name="correta" value="${i}" id="alt-${i}">
+                           <label for="alt-${i}">${texto}</label>`;
+        }
+        alternativasDiv.appendChild(div);
+      });
+    }
 
     btnEnviar.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -278,6 +294,7 @@
 
       let alternativas = [];
       let respostaCorreta = null;
+      let itens = [];
 
       if (tipoQuestao === "certo-errado") {
         alternativas = ["Certo", "Errado"];
@@ -291,6 +308,11 @@
         });
         const selected = document.querySelector('input[name="correta"]:checked');
         respostaCorreta = parseInt(selected?.value);
+
+        if (tipoQuestao === "com-itens") {
+          const itemFields = itensDiv.querySelectorAll("textarea");
+          itens = Array.from(itemFields).map(t => t.value.trim());
+        }
       }
 
       const questao = {
@@ -301,6 +323,10 @@
         respostaCorreta
       };
 
+      if (tipoQuestao === "com-itens") {
+        questao.itens = itens;
+      }
+
       try {
         const res = await fetch('http://localhost:3000/questoes', {
           method: 'POST',
@@ -310,11 +336,11 @@
 
         if (res.ok) {
           alert("Questão cadastrada com sucesso!");
-
-          // Resetar campos
           document.getElementById("imsg").value = "";
           alternativasDiv.innerHTML = "";
-          if (tipoQuestao === "multipla") {
+          itensDiv.innerHTML = "";
+
+          if (tipoQuestao === "multipla" || tipoQuestao === "com-itens") {
             modoEdicao = true;
             alternativasDiv.className = "modo-edicao";
             toggleModoBtn.textContent = "Editar Alternativas";
@@ -322,6 +348,7 @@
             adicionarAlternativa();
             adicionarAlternativa();
           }
+
           btnEnviar.style.display = "none";
         } else {
           alert("Erro ao cadastrar a questão.");
@@ -331,7 +358,7 @@
       }
     });
 
-    // Inicia com 2 alternativas
+    // Inicializa com duas alternativas
     window.addEventListener("load", () => {
       adicionarAlternativa();
       adicionarAlternativa();

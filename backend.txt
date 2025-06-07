@@ -5,20 +5,18 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // Serve arquivos estáticos da pasta public
+app.use(express.static('public')); // <-- serve arquivos estáticos da pasta public
 
 mongoose.connect('mongodb://localhost:27017/bancoDeQuestoes')
   .then(() => console.log("MongoDB conectado!"))
   .catch((err) => console.error("Erro ao conectar ao MongoDB:", err));
 
-// Agora o schema aceita também o campo 'itens'
 const questaoSchema = new mongoose.Schema({
   disciplina: String,
   tipo: String,
   enunciado: String,
   alternativas: [String],
-  respostaCorreta: Number,
-  itens: [String] // <--- Adicione esta linha
+  respostaCorreta: Number
 });
 
 const Questao = mongoose.model('Questao', questaoSchema, 'sistemaQuestoes');
@@ -56,6 +54,7 @@ app.get('/disciplinas', async (req, res) => {
   }
 });
 
-app.listen(3000, '0.0.0.0', () => {
+
+app.listen(3000, '0.0.0.0', () => { // <- importante para aceitar conexões externas
   console.log("Servidor rodando na porta 3000");
 });
