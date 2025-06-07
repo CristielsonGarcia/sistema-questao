@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Responder Questões</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-color: #1f1f1f;
+      --text-color: #e0e0e0;
+      --primary: #2196f3;
+      --primary-hover: #1976d2;
+      --success: #4caf50;
+      --error: #e53935;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+    }
+
+    select {
+      display: block;
+      margin: 20px auto;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background-color: var(--card-color);
+      color: var(--text-color);
+      font-size: 1em;
+      transition: background 0.3s;
+    }
+
+    select:hover {
+      background-color: #2c2c2c;
+    }
+
+    #questao-container {
+      max-width: 800px;
+      margin: 0 auto;
+      margin-top: 20px;
+    }
+
+    .questao {
+      background-color: var(--card-color);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      margin-bottom: 20px;
+    }
+
+    .alternativas {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .alternativa {
+      padding: 10px 15px;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .alternativa:hover {
+      background-color: #333;
+    }
+
+    .alternativa.correta {
+      background-color: var(--success) !important;
+      color: white;
+      font-weight: bold;
+    }
+
+    .alternativa.errada {
+      background-color: var(--error) !important;
+      color: white;
+    }
+
+    .alternativa.desabilitada {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    #btn-proxima {
+      display: none;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+    }
+
+    #btn-proxima:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #progresso {
+      margin: 20px auto;
+      max-width: 800px;
+      height: 20px;
+      background-color: #333;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #barra {
+      height: 100%;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    #placar {
+      text-align: center;
+      font-size: 1em;
+      margin-top: 10px;
+    }
+
+    #resultado-final {
+      text-align: center;
+      font-size: 1.3em;
+      margin-top: 30px;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <h1><i class="fas fa-pen-alt"></i> Responder Questões</h1>
+
+  <label for="disciplina" style="display: block; text-align: center;">Selecione uma disciplina:</label>
+  <select id="disciplina">
+    <option value="">--- Escolha ---</option>
+    <option value="D01">Disciplina01</option>
+    <option value="D02">Disciplina02</option>
+  </select>
+
+  <div id="progresso" style="display: none;">
+    <div id="barra"></div>
+  </div>
+  <div id="placar"></div>
+
+  <div id="questao-container"></div>
+  <button id="btn-proxima">Próxima Questão</button>
+
+  <div id="resultado-final"></div>
+
+  <script>
+    const select = document.getElementById('disciplina');
+    const container = document.getElementById('questao-container');
+    const btnProxima = document.getElementById('btn-proxima');
+    const barra = document.getElementById('barra');
+    const progresso = document.getElementById('progresso');
+    const placar = document.getElementById('placar');
+    const resultadoFinal = document.getElementById('resultado-final');
+
+    let questoes = [];
+    let indiceAtual = 0;
+    let acertos = 0;
+    let erros = 0;
+
+    select.addEventListener('change', async () => {
+      const disciplina = select.value;
+      container.innerHTML = '';
+      resultadoFinal.innerHTML = '';
+      btnProxima.style.display = 'none';
+      progresso.style.display = 'none';
+      placar.innerHTML = '';
+      indiceAtual = 0;
+      acertos = 0;
+      erros = 0;
+
+      if (!disciplina) return;
+
+      try {
+        const res = await fetch(`http://localhost:3000/questoes/${disciplina}`);
+        questoes = await res.json();
+
+        if (questoes.length === 0) {
+          container.innerHTML = '<p style="text-align:center">Nenhuma questão encontrada.</p>';
+          return;
+        }
+
+        progresso.style.display = 'block';
+        mostrarQuestao();
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p style="text-align:center">Erro ao buscar questões.</p>';
+      }
+    });
+
+    function mostrarQuestao() {
+      container.innerHTML = '';
+      btnProxima.style.display = 'none';
+
+      if (indiceAtual >= questoes.length) {
+        container.innerHTML = '';
+        progresso.style.display = 'none';
+        placar.innerHTML = '';
+        resultadoFinal.innerHTML = `
+          <p><strong>Fim das questões!</strong></p>
+          <p>Acertos: <strong style="color: var(--success)">${acertos}</strong> | Erros: <strong style="color: var(--error)">${erros}</strong></p>
+        `;
+        return;
+      }
+
+      const q = questoes[indiceAtual];
+      const div = document.createElement('div');
+      div.classList.add('questao');
+
+      const alternativasHTML = q.alternativas.map((alt, idx) => `
+        <div class="alternativa" data-idx="${idx}" data-correta="${q.respostaCorreta}">
+          ${alt}
+        </div>
+      `).join('');
+
+      div.innerHTML = `
+        <p><strong>Questão ${indiceAtual + 1}:</strong> ${q.enunciado}</p>
+        <div class="alternativas">${alternativasHTML}</div>
+      `;
+
+      container.appendChild(div);
+      atualizarBarra();
+      atualizarPlacar();
+      ativarResposta();
+    }
+
+    function ativarResposta() {
+      const grupo = document.querySelector('.alternativas');
+      const alternativas = grupo.querySelectorAll('.alternativa');
+
+      alternativas.forEach(alt => {
+        alt.addEventListener('click', () => {
+          const idxEscolhido = parseInt(alt.dataset.idx);
+          const idxCorreto = parseInt(alt.dataset.correta);
+
+          alternativas.forEach(a => a.classList.add('desabilitada'));
+
+          if (idxEscolhido === idxCorreto) {
+            alt.classList.add('correta');
+            acertos++;
+          } else {
+            alt.classList.add('errada');
+            alternativas[idxCorreto].classList.add('correta');
+            erros++;
+          }
+
+          btnProxima.style.display = 'block';
+          atualizarPlacar();
+        });
+      });
+    }
+
+    btnProxima.addEventListener('click', () => {
+      indiceAtual++;
+      mostrarQuestao();
+    });
+
+    function atualizarBarra() {
+      const porcentagem = ((indiceAtual) / questoes.length) * 100;
+      barra.style.width = `${porcentagem}%`;
+    }
+
+    function atualizarPlacar() {
+      placar.innerHTML = `Acertos: <strong style="color: var(--success)">${acertos}</strong> | Erros: <strong style="color: var(--error)">${erros}</strong>`;
+    }
+  </script>
+</body>
+</html>
