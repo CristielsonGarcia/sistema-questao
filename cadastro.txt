@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adicione novas questões</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-color: #1a1a1a;
+      --text-color: #e0e0e0;
+      --primary: #2196f3;
+      --primary-hover: #1976d2;
+      --danger: #d32f2f;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    section, #area-certo-errado, #area-multipla {
+      background-color: var(--card-color);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    select, textarea, input[type="text"], button {
+      background-color: #1f1f1f;
+      color: var(--text-color);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 1em;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    textarea {
+      resize: none;
+      width: 96%;
+    }
+
+    button {
+      cursor: pointer;
+      margin-top: 20px;
+      width: auto;
+      padding: 10px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #btn-enviar {
+      display: none;
+    }
+
+    .alternativas, #alternativas {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alternativa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .alternativa label {
+      cursor: pointer;
+      padding: 10px 20px;
+      background-color: #2a2a2a;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .alternativa input[type="radio"] {
+      display: none;
+    }
+
+    .alternativa input[type="radio"]:checked + label {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .alternativa label:hover {
+      transform: scale(1.05);
+      background-color: #333;
+    }
+
+    .modo-edicao input[type="text"] {
+      display: block;
+    }
+
+    .modo-selecao input[type="text"] {
+      display: none;
+    }
+
+    .alternativa.selecionavel {
+      width: 100%;
+      justify-content: start;
+    }
+
+    .btn-toggle-modo.edicao {
+      background-color: var(--danger);
+    }
+
+  </style>
+</head>
+<body>
+  <main>
+    <section class="controles">
+      <label for="disciplina">Escolha uma disciplina:</label><br>
+      <select id="disciplina">
+        <option value="">--- Escolha ---</option>
+        <option value="Direito Administrativo">Direito Administrativo</option>
+        <option value="Direito Constitucional">Direito Constitucional</option>
+        <option value="Informática">Informática</option>
+      </select>
+      <div id="tipo-questao" style="display: none;">
+        <br><label for="tipo">Escolha o tipo da questão:</label><br>
+        <select id="tipo">
+          <option value="">--- Escolha ---</option>
+          <option value="certo-errado">Certo/Errado</option>
+          <option value="multipla">Múltipla Escolha</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="enunciado" style="display: none;">
+      <h3>Digite o enunciado da questão:</h3>
+      <textarea id="imsg" rows="6" placeholder="Ex: Qual é a capital do Brasil?"></textarea>
+    </section>
+
+    <div id="area-certo-errado" style="display: none;">
+      <h3>Escolha a resposta correta:</h3>
+      <div class="alternativas">
+        <div class="alternativa">
+          <input type="radio" id="resp-certo" name="resposta-ce" value="Certo">
+          <label for="resp-certo">Certo</label>
+        </div>
+        <div class="alternativa">
+          <input type="radio" id="resp-errado" name="resposta-ce" value="Errado">
+          <label for="resp-errado">Errado</label>
+        </div>
+      </div>
+    </div>
+
+    <div id="area-multipla" style="display: none;">
+      <h3>Alternativas:</h3>
+      <div id="alternativas" class="modo-edicao"></div>
+      <button type="button" id="btn-toggle-modo" class="btn-toggle-modo edicao">
+        <i class="fas fa-edit"></i> Editar Alternativas
+      </button>
+      <button type="button" onclick="adicionarAlternativa()">
+        <i class="fas fa-plus"></i> Adicionar Alternativa
+      </button>
+    </div>
+
+    <button id="btn-enviar"><i class="fas fa-paper-plane"></i> Enviar</button>
+  </main>
+
+  <script>
+    const disciplina = document.getElementById("disciplina");
+    const tipo = document.getElementById("tipo");
+    const tipoContainer = document.getElementById("tipo-questao");
+    const enunciado = document.getElementById("enunciado");
+    const areaCE = document.getElementById("area-certo-errado");
+    const areaMultipla = document.getElementById("area-multipla");
+    const btnEnviar = document.getElementById("btn-enviar");
+    const alternativasDiv = document.getElementById("alternativas");
+    const toggleModoBtn = document.getElementById("btn-toggle-modo");
+
+    let modoEdicao = true;
+
+    disciplina.addEventListener("change", () => {
+      tipoContainer.style.display = disciplina.value ? "block" : "none";
+      tipo.value = "";
+      enunciado.style.display = "none";
+      areaCE.style.display = "none";
+      areaMultipla.style.display = "none";
+      btnEnviar.style.display = "none";
+    });
+
+    tipo.addEventListener("change", () => {
+      enunciado.style.display = tipo.value ? "block" : "none";
+      areaCE.style.display = tipo.value === "certo-errado" ? "block" : "none";
+      areaMultipla.style.display = tipo.value === "multipla" ? "block" : "none";
+      btnEnviar.style.display = "none";
+    });
+
+    toggleModoBtn.addEventListener("click", () => {
+      modoEdicao = !modoEdicao;
+      toggleModoBtn.textContent = modoEdicao ? "Editar Alternativas" : "Escolher Alternativa";
+      toggleModoBtn.classList.toggle("edicao", modoEdicao);
+
+      alternativasDiv.className = modoEdicao ? "modo-edicao" : "modo-selecao";
+      atualizarAlternativas(); // manter conteúdo
+      btnEnviar.style.display = "none";
+    });
+
+    function atualizarAlternativas() {
+      const valores = Array.from(alternativasDiv.querySelectorAll('.alternativa')).map((el, i) => {
+        const texto = el.querySelector('input[type="text"]')?.value || el.textContent.trim();
+        return texto;
+      });
+
+      alternativasDiv.innerHTML = "";
+      valores.forEach((texto, i) => {
+        const div = document.createElement("div");
+        div.className = "alternativa" + (modoEdicao ? "" : " selecionavel");
+        if (modoEdicao) {
+          div.innerHTML = `<input type="radio" name="correta" value="${i}"><input type="text" value="${texto}" placeholder="Alternativa ${String.fromCharCode(65 + i)}">`;
+        } else {
+          div.innerHTML = `<input type="radio" name="correta" value="${i}" id="alt-${i}">
+                           <label for="alt-${i}">${texto}</label>`;
+        }
+        alternativasDiv.appendChild(div);
+      });
+    }
+
+    function adicionarAlternativa() {
+      const count = alternativasDiv.children.length;
+      if (count >= 5) return alert("Máximo de 5 alternativas.");
+      const nova = document.createElement("div");
+      nova.className = "alternativa";
+      nova.innerHTML = `<input type="radio" name="correta" value="${count}">
+                        <input type="text" placeholder="Alternativa ${String.fromCharCode(65 + count)}">`;
+      alternativasDiv.appendChild(nova);
+    }
+
+    document.body.addEventListener('change', () => {
+      const selected = document.querySelector('input[name="correta"]:checked') ||
+                       document.querySelector('input[name="resposta-ce"]:checked');
+      btnEnviar.style.display = selected ? "inline-flex" : "none";
+    });
+
+    btnEnviar.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const tipoQuestao = tipo.value;
+      const disciplinaSelecionada = disciplina.value;
+      const enunciadoTexto = document.getElementById("imsg").value.trim();
+
+      if (!disciplinaSelecionada || !tipoQuestao || !enunciadoTexto) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      let alternativas = [];
+      let respostaCorreta = null;
+
+      if (tipoQuestao === "certo-errado") {
+        alternativas = ["Certo", "Errado"];
+        const selected = document.querySelector('input[name="resposta-ce"]:checked');
+        respostaCorreta = alternativas.indexOf(selected?.value);
+      } else {
+        const alts = alternativasDiv.querySelectorAll('.alternativa');
+        alternativas = Array.from(alts).map((alt) => {
+          const input = alt.querySelector('input[type="text"]');
+          return input ? input.value.trim() : alt.textContent.trim();
+        });
+        const selected = document.querySelector('input[name="correta"]:checked');
+        respostaCorreta = parseInt(selected?.value);
+      }
+
+      const questao = {
+        disciplina: disciplinaSelecionada,
+        tipo: tipoQuestao,
+        enunciado: enunciadoTexto,
+        alternativas,
+        respostaCorreta
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/questoes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(questao)
+        });
+
+        if (res.ok) {
+          alert("Questão cadastrada com sucesso!");
+
+          // Resetar campos
+          document.getElementById("imsg").value = "";
+          alternativasDiv.innerHTML = "";
+          if (tipoQuestao === "multipla") {
+            modoEdicao = true;
+            alternativasDiv.className = "modo-edicao";
+            toggleModoBtn.textContent = "Editar Alternativas";
+            toggleModoBtn.classList.add("edicao");
+            adicionarAlternativa();
+            adicionarAlternativa();
+          }
+          btnEnviar.style.display = "none";
+        } else {
+          alert("Erro ao cadastrar a questão.");
+        }
+      } catch (err) {
+        alert("Erro de conexão com o servidor.");
+      }
+    });
+
+    // Inicia com 2 alternativas
+    window.addEventListener("load", () => {
+      adicionarAlternativa();
+      adicionarAlternativa();
+    });
+  </script>
+</body>
+</html>

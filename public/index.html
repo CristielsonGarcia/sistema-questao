@@ -24,6 +24,21 @@
       margin: 0;
     }
 
+    #botao-adicionar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: var(--primary);
+      color: white;
+      padding: 14px 18px;
+      font-size: 1.3em;
+      border-radius: 50%;
+      text-decoration: none;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+      z-index: 999;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
     h1 {
       text-align: center;
       color: var(--primary);
@@ -113,8 +128,6 @@
     }
 
     .enunciado-texto {
-      white-space: pre-line;
-      word-wrap: break-word;
       text-align: justify;
     }
 
@@ -211,12 +224,21 @@
   </style>
 </head>
 <body>
+  <a href="cadastro.html" id="botao-adicionar" title="Cadastrar nova questão">
+    <i class="fas fa-plus"></i>
+  </a>
   <h1><i class="fas fa-pen-alt"></i> Responder Questões</h1>
 
   <label class="selecionarDisciplina" for="disciplina" style="display: block; text-align: center;">Selecione uma disciplina:</label>
-  <select id="disciplina" style="text-align: center;">
+  <select id="disciplina" style="text-align: left;">
     <option value="">--- Escolha ---</option>
   </select>
+
+  <label class="selecionarAssunto" for="assunto" style="display: block; text-align: center;">Selecione o assunto:</label>
+  <select id="assunto" style="text-align: left;" disabled>
+    <option value="">--- Escolha uma disciplina primeiro ---</option>
+  </select>
+
 
   <div id="progresso" style="display: none;">
     <div id="barra"></div>
@@ -229,11 +251,44 @@
   <div id="resultado-final"></div>
 
   <script>
-    const SERVER_URL = location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "http://192.168.1.95:3000"; // Substitua pelo IP do seu PC se necessário
+    let SERVER_URL = "http://localhost:3000";
+
+    async function carregarConfiguracao() {
+      try {
+        const res = await fetch('/config');
+        const config = await res.json();
+        if (config.serverUrl) {
+          SERVER_URL = config.serverUrl;
+        }
+      } catch (err) {
+        console.warn("Erro ao carregar config. Usando localhost.");
+      }
+    }
+
+    async function init() {
+      await carregarConfiguracao();
+      
+      // ... seu código aqui
+      carregarDisciplinas(); // chame a função só depois de configurar
+    }
+
+    init();
 
     const select = document.getElementById('disciplina');
+    const assuntoSelect = document.getElementById('assunto');
+
+    const assuntosPorDisciplina = {
+      "Direito Administrativo": ["Atos Administrativos","Organização Administrativa", "Poderes da Administração", "Serviços Públicos"],
+      "Direito Constitucional": ["Organização político-administrativa", "Direitos e Deveres Individuais e Coletivos", "Direitos Sociais", "Nacionalidade"],
+      "Gestão de Pessoas": ["Gestão por Competências", "Modelos de Gestão de Pessoas"],
+      "Noções de Gestão de Contratos": ["Licitações e Contratos Administrativos"],
+      "Noções de Governança Pública": ["Planejamento Estratégico"],
+      "Noções de Recursos de Materiais": ["Conceitos de Estoques"],
+      "Informática": ["Cloud Computing","Redes de Computadores", "Segurança da Informação", "Sistemas Operacionais", "Sítios de busca e pesquisa na Internet"],
+      "Língua Portuguesa": ["Verbo"],
+      "Raciocínio Lógico": ["Análise Combinatória"]
+    }
+    
     const container = document.getElementById('questao-container');
     const btnProxima = document.getElementById('btn-proxima');
     btnProxima.style.display = 'none'; // Oculta o botão assim que a página carrega
@@ -247,8 +302,10 @@
     let acertos = 0;
     let erros = 0;
 
-    select.addEventListener('change', async () => {
+    assuntoSelect.addEventListener('change', async () => {
       const disciplina = select.value;
+      const assunto = assuntoSelect.value;
+
       container.innerHTML = '';
       resultadoFinal.innerHTML = '';
       btnProxima.style.display = 'none';
@@ -258,10 +315,10 @@
       acertos = 0;
       erros = 0;
 
-      if (!disciplina) return;
+      if (!disciplina || !assunto) return;
 
       try {
-        const res = await fetch(`${SERVER_URL}/questoes/${disciplina}`);
+        const res = await fetch(`${SERVER_URL}/questoes/${disciplina}?assunto=${encodeURIComponent(assunto)}`);
         questoes = await res.json();
         questoes = embaralharArray(questoes);
 
@@ -277,6 +334,25 @@
         container.innerHTML = '<p style="text-align:center">Erro ao buscar questões.</p>';
       }
     });
+
+
+    select.addEventListener('change', () => {
+      const disciplina = select.value;
+      assuntoSelect.innerHTML = '<option value="">--- Escolha ---</option>';
+      assuntoSelect.disabled = !disciplina;
+
+      if (disciplina && assuntosPorDisciplina[disciplina]) {
+        assuntosPorDisciplina[disciplina].forEach(assunto => {
+          const option = document.createElement('option');
+          option.value = assunto;
+          option.textContent = assunto;
+          assuntoSelect.appendChild(option);
+        });
+      }
+
+  container.innerHTML = '';
+});
+
 
     function mostrarQuestao() {
       
@@ -326,7 +402,7 @@
       }
 
       div.innerHTML = `
-        <p class="enunciado-texto"><strong>Questão ${indiceAtual + 1}:</strong>\n${q.enunciado}</p>
+        <p class="enunciado-texto"><strong>Questão ${indiceAtual + 1}:</strong><br><br>${q.enunciado}</p>
         ${itensHTML}
         <div class="alternativas">${alternativasHTML}</div>
       `;
@@ -407,8 +483,6 @@
       }
     }
 
-    // Carregar ao abrir a página
-    carregarDisciplinas();
   </script>
 </body>
 </html>

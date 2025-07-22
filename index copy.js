@@ -52,9 +52,7 @@ app.get('/questoes/:disciplina', async (req, res) => {
     const { assunto } = req.query;
 
     const filtro = { disciplina };
-    if (assunto) {
-      filtro.assunto = assunto;
-    }
+    if (assunto) filtro.assunto = assunto;
 
     const questoes = await Questao.find(filtro);
     res.status(200).json(questoes);
@@ -63,6 +61,7 @@ app.get('/questoes/:disciplina', async (req, res) => {
     res.status(500).json({ message: "Erro ao buscar questões." });
   }
 });
+
 
 // Rota para buscar todas as disciplinas disponíveis com questões cadastradas
 app.get('/disciplinas', async (req, res) => {
